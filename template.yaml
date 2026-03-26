@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: java17
+    MemorySize: 512
+    Timeout: 10
+
+Resources:
+
+  #########################################
+  # DynamoDB Table
+  #########################################
+  BooksTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Books
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: bookId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: bookId
+          KeyType: HASH
+
+  #########################################
+  # S3 Bucket
+  #########################################
+  BookBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "bookstore-bucket-${AWS::AccountId}"
+
+  #########################################
+  # Upload Book (metadata → DynamoDB)
+  #########################################
+  UploadBookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.bookstore.handler.UploadBookHandler
+
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref BookBucket
+          TABLE_NAME: !Ref BooksTable
+
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - AmazonS3FullAccess
+
+      Events:
+        UploadApi:
+          Type: Api
+          Properties:
+            Path: /books
+            Method: post
+
+  #########################################
+  # Search Books (OpenSearch placeholder)
+  #########################################
+  SearchBookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.bookstore.handler.SearchBookHandler
+
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+
+      Events:
+        SearchApi:
+          Type: Api
+          Properties:
+            Path: /books/search
+            Method: get
+
+  #########################################
+  # Generate S3 Upload URL
+  #########################################
+  GenerateUploadUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.bookstore.handler.GenerateUploadUrlHandler
+
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref BookBucket
+
+      Policies:
+        - AmazonS3FullAccess
+
+      Events:
+        UploadUrlApi:
+          Type: Api
+          Properties:
+            Path: /books/upload-url
+            Method: get
+
+  GenerateDownloadUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.bookstore.handler.GenerateDownloadUrlHandler
+
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref BookBucket
+
+      Policies:
+        - AmazonS3FullAccess
+
+      Events:
+        DownloadApi:
+          Type: Api
+          Properties:
+            Path: /books/download
+            Method: get
+
+  GetBookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.bookstore.handler.GetBookHandler
+
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref BooksTable
+          BUCKET_NAME: !Ref BookBucket
+
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+        - AmazonS3FullAccess
+
+      Events:
+        GetBookApi:
+          Type: Api
+          Properties:
+            Path: /books/{bookId}
+            Method: get
+#########################################
+# Outputs
+#########################################
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
+  BucketName:
+    Description: "S3 bucket for book uploads"
+    Value: !Ref BookBucket
+
+  TableName:
+    Description: "DynamoDB table name"
+    Value: !Ref BooksTable
