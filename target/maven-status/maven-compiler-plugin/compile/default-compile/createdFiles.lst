@@ -1,9 +1,0 @@
-com\bookstore\handler\GenerateDownloadUrlHandler.class
-com\bookstore\handler\UploadBookHandler.class
-com\bookstore\util\AwsClientFactory.class
-com\bookstore\handler\GenerateUploadUrlHandler.class
-com\bookstore\handler\SearchBookHandler.class
-com\bookstore\model\Book.class
-com\bookstore\service\BookService.class
-com\bookstore\util\ResponseUtil.class
-com\bookstore\handler\GetBookHandler.class
