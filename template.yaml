@@ -96,6 +96,9 @@ Resources:
             Path: /books/upload-url
             Method: get
 
+  #########################################
+  # Generate S3 Download Url
+  #########################################
   GenerateDownloadUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -115,6 +118,9 @@ Resources:
             Path: /books/download
             Method: get
 
+  ############################################
+  # Get book meta data including download url
+  ############################################
   GetBookFunction:
     Type: AWS::Serverless::Function
     Properties:
