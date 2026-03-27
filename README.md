@@ -2,6 +2,13 @@
 $apiBaseUrl = "https://your-api-id.execute-api.your-region.amazonaws.com/Prod"
 $response = Invoke-RestMethod "$apiBaseUrl/books/upload-url"
 
+Invoke-WebRequest `
+  -Uri $response.uploadUrl `
+-Method Put `
+-InFile ".\sample-upload.pdf"
+
+or curl
+
 curl.exe -X PUT `
   -T ".\sample-upload.pdf" `
   "$($response.uploadUrl)"
