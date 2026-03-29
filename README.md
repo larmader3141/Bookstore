@@ -53,6 +53,7 @@ npm install
 1) npm run build
 2) 
   npm run dev
+  http://localhost:5173/index.html
 or
   aws s3 sync dist/ s3://bookstore-ui-bucket-demo
 

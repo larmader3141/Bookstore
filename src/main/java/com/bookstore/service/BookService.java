@@ -1,9 +1,12 @@
 package com.bookstore.service;
 
 import com.bookstore.model.Book;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 import software.amazon.awssdk.services.opensearch.OpenSearchClient;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -14,6 +17,9 @@ import java.time.Duration;
 import java.util.*;
 
 public class BookService {
+    private final S3Client s3 = S3Client.builder()
+            .region(Region.US_WEST_1)
+            .build();
     private final DynamoDbClient dynamo = DynamoDbClient.create();
     private final String tableName = System.getenv("TABLE_NAME");
 
@@ -132,6 +138,33 @@ public class BookService {
         return books;
     }
 
+    public void deleteBook(String bookId) {
+
+        // 1. Get book (to retrieve fileKey)
+        Book book = getBookById(bookId);
+
+        if (book == null) {
+            throw new RuntimeException("Book not found");
+        }
+
+        String bucket = System.getenv("BUCKET_NAME");
+
+        // 2. Delete file from S3
+        s3.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(book.getFileKey())
+                .build());
+
+        // 3. Delete item from DynamoDB
+        Map<String, AttributeValue> key = Map.of(
+                "bookId", AttributeValue.builder().s(bookId).build()
+        );
+
+        dynamo.deleteItem(DeleteItemRequest.builder()
+                .tableName(System.getenv("TABLE_NAME"))
+                .key(key)
+                .build());
+    }
     public void indexBook(Book book) {
 
         OpenSearchClient client = OpenSearchClient.create();

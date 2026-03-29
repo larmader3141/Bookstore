@@ -8,7 +8,7 @@ Globals:
     Timeout: 10
   Api:
     Cors:
-      AllowMethods: "'GET,POST,PUT,OPTIONS'"
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
       AllowHeaders: "'Content-Type'"
       AllowOrigin: "'*'"
 Resources:
@@ -167,6 +167,31 @@ Resources:
           Properties:
             Path: /books
             Method: get
+
+  ############################################
+  # delete a book
+  ############################################
+  DeleteBookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.bookstore.handler.DeleteBookHandler
+
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref BooksTable
+          BUCKET_NAME: !Ref BookBucket
+
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BooksTable
+        - AmazonS3FullAccess
+
+      Events:
+        DeleteBookApi:
+          Type: Api
+          Properties:
+            Path: /books/{bookId}
+            Method: delete
 
 #########################################
 # Outputs
