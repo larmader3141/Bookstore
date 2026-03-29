@@ -2,9 +2,7 @@ package com.bookstore.service;
 
 import com.bookstore.model.Book;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
-import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.*;
 import software.amazon.awssdk.services.opensearch.OpenSearchClient;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -13,9 +11,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class BookService {
     private final DynamoDbClient dynamo = DynamoDbClient.create();
@@ -110,6 +106,30 @@ public class BookService {
         book.setFileKey(item.get("fileKey").s());
 
         return book;
+    }
+
+    public List<Book> getAllBooks() {
+
+        ScanRequest request = ScanRequest.builder()
+                .tableName(System.getenv("TABLE_NAME"))
+                .build();
+
+        ScanResponse response = dynamo.scan(request);
+
+        List<Book> books = new ArrayList<>();
+
+        for (Map<String, AttributeValue> item : response.items()) {
+            Book book = new Book();
+
+            book.setBookId(item.get("bookId").s());
+            book.setTitle(item.get("title").s());
+            book.setAuthor(item.get("author").s());
+            book.setFileKey(item.get("fileKey").s());
+
+            books.add(book);
+        }
+
+        return books;
     }
 
     public void indexBook(Book book) {

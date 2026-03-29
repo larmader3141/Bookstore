@@ -1,3 +1,10 @@
+This is a simple demo application that demonstrates an AWS serverless
+application. It uses AWS lambdas and the API Gateway for the application functions. 
+
+The front end is a static javascript application using React.
+
+
+
 1) upload a file
 $apiBaseUrl = "https://your-api-id.execute-api.your-region.amazonaws.com/Prod"
 $response = Invoke-RestMethod "$apiBaseUrl/books/upload-url"
@@ -37,5 +44,15 @@ Invoke-WebRequest `
   -OutFile ".\downloaded.pdf"
 
 
+// deploy the front end
 
+From the bookstore-ui folder
+
+npm install
+
+1) npm run build
+2) 
+  npm run dev
+or
+  aws s3 sync dist/ s3://bookstore-ui-bucket-demo
 

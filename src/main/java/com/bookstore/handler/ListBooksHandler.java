@@ -9,20 +9,22 @@ import com.bookstore.service.BookService;
 import com.bookstore.util.ResponseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class UploadBookHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+import java.util.List;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+public class ListBooksHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+
     private final BookService service = new BookService();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
 
         try {
-            Book book = mapper.readValue(request.getBody(), Book.class);
+            List<Book> books = service.getAllBooks();
 
-            Book saved = service.save(book);
-
-            return ResponseUtil.ok(mapper.writeValueAsString(saved));
+            return ResponseUtil.ok(
+                    mapper.writeValueAsString(books)
+            );
 
         } catch (Exception e) {
             return ResponseUtil.error(e.getMessage());

@@ -9,13 +9,22 @@ public class ResponseUtil {
     public static APIGatewayProxyResponseEvent ok(String body) {
         return new APIGatewayProxyResponseEvent()
                 .withStatusCode(200)
-                .withHeaders(Map.of("Content-Type", "application/json"))
+                .withHeaders(Map.of(
+                        "Content-Type", "application/json",
+                        "Access-Control-Allow-Origin", "*",
+                        "Access-Control-Allow-Headers", "Content-Type",
+                        "Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS"
+                ))
                 .withBody(body);
     }
 
     public static APIGatewayProxyResponseEvent error(String message) {
         return new APIGatewayProxyResponseEvent()
                 .withStatusCode(500)
+                .withHeaders(Map.of(
+                        "Content-Type", "application/json",
+                        "Access-Control-Allow-Origin", "*"
+                ))
                 .withBody(message);
     }
 }

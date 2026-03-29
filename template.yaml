@@ -6,7 +6,11 @@ Globals:
     Runtime: java17
     MemorySize: 512
     Timeout: 10
-
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,PUT,OPTIONS'"
+      AllowHeaders: "'Content-Type'"
+      AllowOrigin: "'*'"
 Resources:
 
   #########################################
@@ -141,6 +145,29 @@ Resources:
           Properties:
             Path: /books/{bookId}
             Method: get
+
+  ############################################
+  # list available books
+  ############################################
+  ListBooksFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.bookstore.handler.ListBooksHandler
+
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref BooksTable
+
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+
+      Events:
+        ListBooksApi:
+          Type: Api
+          Properties:
+            Path: /books
+            Method: get
+
 #########################################
 # Outputs
 #########################################

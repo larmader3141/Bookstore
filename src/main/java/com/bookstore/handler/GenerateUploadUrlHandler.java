@@ -32,8 +32,8 @@ public class GenerateUploadUrlHandler implements RequestHandler<APIGatewayProxyR
 
         try {
             return ResponseUtil.ok(mapper.writeValueAsString(response));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            return ResponseUtil.error(e.getMessage());
         }
     }
 }
