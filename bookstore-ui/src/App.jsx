@@ -101,9 +101,13 @@ export default function App() {
 
 {/*           <pre>{JSON.stringify(result, null, 2)}</pre> */}
 
-      <hr />
-      <h2>Book List</h2>
-      <hr />
+    <div>
+           <br />
+    </div>
+          <h2>Book List</h2>
+    <div>
+           <br />
+    </div>
 
       {loading && <p>⏳ Processing...</p>}
 

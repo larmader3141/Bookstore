@@ -57,3 +57,6 @@ npm install
 or
   aws s3 sync dist/ s3://bookstore-ui-bucket-demo
 
+invalidate cache:
+aws cloudfront create-invalidation --distribution-id E1RAT1YIYJT3VP --paths "/*"
+
